@@ -6,6 +6,7 @@ android/app/build/
 ios/Pods/
 *.keystore
 .env
+.next
 # Dependencies
 node_modules/
 npm-debug.log*
