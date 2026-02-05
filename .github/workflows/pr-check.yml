@@ -1,0 +1,126 @@
+name: PR Check
+
+on:
+  pull_request:
+    branches: [main, develop]
+
+permissions:
+  contents: read
+  pull-requests: write
+  issues: write
+
+jobs:
+  pr-checks:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Use Node.js 18
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run lint
+        id: lint
+        continue-on-error: true
+        run: |
+          if npm run | grep -q "lint"; then
+            echo "Lint script found. Running..."
+            npm run lint 2>&1 | tee lint-output.txt
+          else
+            echo "No lint script found; skipping lint." | tee lint-output.txt
+          fi
+
+      - name: Run tests
+        id: test
+        continue-on-error: true
+        run: |
+          if npm run | grep -q "test"; then
+            echo "Test script found. Running..."
+            npm test --silent 2>&1 | tee test-output.txt
+          else
+            echo "No test script found; skipping tests." | tee test-output.txt
+          fi
+
+      - name: Post PR summary comment (with logs)
+        uses: actions/github-script@v7
+        env:
+          LINT_OUTCOME: ${{ steps.lint.outcome }}
+          TEST_OUTCOME: ${{ steps.test.outcome }}
+        with:
+          script: |
+            const fs = require("fs");
+
+            const pr = context.payload.pull_request;
+
+            const lintState = process.env.LINT_OUTCOME;
+            const testState = process.env.TEST_OUTCOME;
+
+            function emoji(state) {
+              if (state === "success") return "✅";
+              if (state === "failure") return "❌";
+              return "⚠️";
+            }
+
+            function safeRead(path) {
+              try {
+                return fs.readFileSync(path, "utf8");
+              } catch {
+                return "No output file found.";
+              }
+            }
+
+            let lintOutput = safeRead("lint-output.txt");
+            let testOutput = safeRead("test-output.txt");
+
+            const MAX = 3000;
+            if (lintOutput.length > MAX) lintOutput = lintOutput.slice(-MAX);
+            if (testOutput.length > MAX) testOutput = testOutput.slice(-MAX);
+
+            const body = `
+            **Automated PR checks completed**
+
+            - Lint: ${emoji(lintState)} \`${lintState}\`
+            - Tests: ${emoji(testState)} \`${testState}\`
+
+            <details>
+            <summary><strong>Lint output</strong></summary>
+
+            \`\`\`
+            ${lintOutput}
+            \`\`\`
+            </details>
+
+            <details>
+            <summary><strong>Test output</strong></summary>
+
+            \`\`\`
+            ${testOutput}
+            \`\`\`
+            </details>
+            `.trim();
+
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: pr.number,
+              body
+            });
+
+      - name: Add label on failure
+        if: ${{ steps.test.outcome == 'failure' || steps.lint.outcome == 'failure' }}
+        uses: actions-ecosystem/action-add-labels@v1
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          labels: tests-failed
+
+      - name: Add label on success
+        if: ${{ steps.test.outcome == 'success' && steps.lint.outcome == 'success' }}
+        uses: actions-ecosystem/action-add-labels@v1
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          labels: ci-passed
