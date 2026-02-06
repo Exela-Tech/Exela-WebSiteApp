@@ -1,4 +1,4 @@
-name: PR Check
+name: Exela CI
 
 on:
   pull_request:
@@ -10,7 +10,7 @@ permissions:
   issues: write
 
 jobs:
-  pr-checks:
+  meta-checks:
     runs-on: ubuntu-latest
 
     steps:
@@ -22,13 +22,19 @@ jobs:
           node-version: 18
 
       - name: Install dependencies
-        run: npm install
+        run: |
+          if [ -f package.json ]; then
+            echo "Root package.json found. Installing dependencies with npm ci..."
+            npm ci
+          else
+            echo "No root package.json found. Skipping root dependency installation."
+          fi
 
       - name: Run lint
         id: lint
         continue-on-error: true
         run: |
-          if npm run | grep -q "lint"; then
+          if [ -f package.json ] && npm run | grep -q "lint"; then
             echo "Lint script found. Running..."
             npm run lint 2>&1 | tee lint-output.txt
           else
@@ -124,3 +130,77 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           labels: ci-passed
+
+  api:
+    name: API (Node) checks
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: api
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Use Node.js 18
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Install API dependencies
+        run: npm ci
+
+      - name: Run API tests (if available)
+        id: api-test
+        continue-on-error: true
+        run: |
+          if npm run | grep -q "test"; then
+            echo "API test script found. Running..."
+            npm test --silent
+          else
+            echo "No API test script found; skipping tests."
+          fi
+
+  web:
+    name: Web client (React) checks
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: client
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Use Node.js 18
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Install client dependencies
+        run: npm ci
+
+      - name: Run client lint
+        run: npm run lint
+
+      - name: Build client
+        run: npm run build
+
+  mobile:
+    name: Mobile app basic checks
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: mobile-app
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Use Node.js 18
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Install mobile dependencies
+        run: npm ci
