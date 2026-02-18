@@ -923,7 +923,7 @@ export default function PostListingPreview() {
                     <Check className="h-5 w-5 mr-2" />
                     <div className="flex-1">
                       <p className="font-medium">Your listing has been successfully created!</p>
-                      <p className="text-sm mt-1">You'll be redirected to your listings dashboard in a moment.</p>
+                      <p className="text-sm mt-1">You&apos;ll be redirected to your listings dashboard in a moment.</p>
                     </div>
                     <button
                       onClick={() => navigate("/rental-manager?postingPath=true")}
