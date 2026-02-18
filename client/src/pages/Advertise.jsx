@@ -59,7 +59,7 @@ export default function Advertise() {
 
       {userListings.length === 0 ? (
         <div className="text-center py-12">
-          <div className="text-gray-500 text-lg mb-4">You don't have any approved listings to advertise yet.</div>
+          <div className="text-gray-500 text-lg mb-4">You don&apos;t have any approved listings to advertise yet.</div>
           <Link
             to="/create-listing"
             className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition duration-200"
