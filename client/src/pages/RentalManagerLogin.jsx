@@ -182,7 +182,7 @@ function RentalManagerLogin() {
           </div>
 
           <h2 className="text-3xl md:text-4xl font-bold text-slate-800 mb-4">
-            It's easier than ever
+            It&apos;s easier than ever
             <br />
             to be a landlord.
           </h2>
