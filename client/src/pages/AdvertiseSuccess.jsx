@@ -28,7 +28,7 @@ export default function AdvertiseSuccess() {
         <h1 className="text-3xl font-bold text-green-600 mb-4">Payment Successful!</h1>
 
         <p className="text-gray-600 mb-6">
-          Your listing "{listing.name}" has been successfully promoted with the {plan.name} package.
+          Your listing &quot;{listing.name}&quot; has been successfully promoted with the {plan.name} package.
         </p>
 
         <div className="bg-gray-50 rounded-lg p-4 mb-6">
