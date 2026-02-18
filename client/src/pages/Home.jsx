@@ -148,7 +148,7 @@ export default function Home() {
               place with ease
             </h1>
             <div className="text-gray-100 text-sm sm:text-base md:text-lg lg:text-xl mb-8 max-w-3xl mx-auto drop-shadow-lg bg-black bg-opacity-40 p-4 md:p-6 rounded-lg backdrop-blur-sm animate-fade-in-delay">
-              Exela Realtors' Estate is the best place to find your next perfect place to live.
+              Exela Realtors&apos; Estate is the best place to find your next perfect place to live.
               <br />
               We have a wide range of beautiful properties for you to choose from.
             </div>
@@ -156,7 +156,7 @@ export default function Home() {
               to={"/search"}
               className="inline-block bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 md:py-4 md:px-8 rounded-lg text-base md:text-lg transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 animate-fade-in-delay-2"
             >
-              Let's get started
+              Let&apos;s get started
             </Link>
           </div>
         </div>
