@@ -93,7 +93,7 @@ export default function AdminAccess() {
               required
             />
             <p className="text-sm text-gray-500">
-              This key is required to grant admin privileges. Contact the system administrator if you don't have it.
+              This key is required to grant admin privileges. Contact the system administrator if you don&apos;t have it.
             </p>
           </div>
 
