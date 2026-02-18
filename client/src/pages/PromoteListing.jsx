@@ -125,7 +125,7 @@ export default function PromoteListing() {
       <div className="flex justify-center items-center min-h-screen">
         <div className="text-center">
           <h2 className="text-2xl font-bold mb-4 text-red-600">Unable to Load Listing</h2>
-          <p className="text-gray-600 mb-4">This listing may not exist or you don't have permission to promote it.</p>
+          <p className="text-gray-600 mb-4">This listing may not exist or you do&apos;t have permission to promote it.</p>
           <Link to="/advertise" className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700">
             Back to Advertise
           </Link>
