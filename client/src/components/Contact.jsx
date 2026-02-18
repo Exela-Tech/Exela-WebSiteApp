@@ -1,6 +1,5 @@
 "use client"
 
-/* eslint-disable react/prop-types */
 import { useEffect, useState } from "react"
 
 function Contact({ listing }) {
@@ -156,7 +155,7 @@ Property ID: ${listing._id}`
       {!selectedMethod ? (
         // Contact method selection
         <div className="space-y-4">
-          <p className="text-gray-600 mb-4">Choose how you'd like to contact the landlord:</p>
+          <p className="text-gray-600 mb-4">Choose how you&apos;d like to contact the landlord:</p>
 
           {/* Contact Options */}
           <div className="space-y-3">
