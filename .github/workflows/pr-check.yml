@@ -69,7 +69,7 @@ jobs:
       - name: Install client dependencies
         run: npm ci
 
-      - name: Run client lint (MUST PASS)
+      - name: Run client lint
         run: npm run lint
 
       - name: Build client
