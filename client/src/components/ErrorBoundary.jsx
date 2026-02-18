@@ -8,7 +8,7 @@ class ErrorBoundary extends React.Component {
     this.state = { hasError: false, error: null, errorInfo: null }
   }
 
-  static getDerivedStateFromError(error) {
+  static getDerivedStateFromError(_error) {
     return { hasError: true }
   }
 
@@ -46,7 +46,7 @@ class ErrorBoundary extends React.Component {
             </div>
 
             <div className="text-sm text-gray-500 mb-4">
-              We're sorry, but something unexpected happened. Please try refreshing the page.
+              We&apos;re sorry, but something unexpected happened. Please try refreshing the page.
             </div>
 
             {import.meta.env.DEV && this.state.error && (
