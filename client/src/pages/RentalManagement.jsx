@@ -23,7 +23,7 @@ export default function RentalManagement() {
   const [properties, setProperties] = useState([])
   const [loading, setLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState("")
-  const [filterStatus, setFilterStatus] = useState("all")
+  const [filterStatus, _setFilterStatus] = useState("all")
   const navigate = useNavigate()
   const location = useLocation()
 
