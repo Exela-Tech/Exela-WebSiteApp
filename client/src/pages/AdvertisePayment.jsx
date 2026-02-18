@@ -5,7 +5,8 @@ import { useParams, useLocation, useNavigate } from "react-router-dom"
 import { useSelector } from "react-redux"
 
 export default function AdvertisePayment() {
-  const { id } = useParams()
+  const { id: listingId } = useParams()
+  const { id: _id } = useParams()
   const location = useLocation()
   const navigate = useNavigate()
   const { currentUser } = useSelector((state) => state.user)
@@ -30,6 +31,7 @@ export default function AdvertisePayment() {
     }, 100)
 
     return () => clearTimeout(timer)
+  },[currentUser,listing,plan,navigate])
   }, [currentUser]) // Remove listing, plan, navigate from dependencies
 
   const handlePayment = async (e) => {
