@@ -1,0 +1,157 @@
+name: Exela CI
+
+on:
+  pull_request:
+    branches: [main, develop]
+
+permissions:
+  contents: read
+  pull-requests: write
+  issues: write
+
+jobs:
+  api:
+    name: API (Node) checks
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: api
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Use Node.js 18
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+          cache: npm
+          cache-dependency-path: api/package-lock.json
+
+      - name: Install API dependencies
+        run: npm ci
+
+      - name: Run API lint (if available)
+        run: |
+          if npm run | grep -q "lint"; then
+            npm run lint
+          else
+            echo "No lint script found in api"
+          fi
+
+      - name: Run API tests (if available)
+        run: |
+          if npm run | grep -q "test"; then
+            npm test --silent
+          else
+            echo "No test script found in api"
+          fi
+
+
+  web:
+    name: Web client (React) checks
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: client
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Use Node.js 18
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+          cache: npm
+          cache-dependency-path: client/package-lock.json
+
+      - name: Install client dependencies
+        run: npm ci
+
+      - name: Run client lint
+        run: npm run lint
+
+      - name: Build client
+        run: npm run build
+
+
+  mobile:
+    name: Mobile app checks
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: mobile-app
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Use Node.js 18
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+          cache: npm
+          cache-dependency-path: mobile-app/package-lock.json
+
+      - name: Install mobile dependencies
+        run: npm ci
+
+      - name: Run mobile lint (if available)
+        run: |
+          if npm run | grep -q "lint"; then
+            npm run lint
+          else
+            echo "No lint script found in mobile-app"
+          fi
+
+      - name: Run mobile tests (if available)
+        run: |
+          if npm run | grep -q "test"; then
+            npm test --silent
+          else
+            echo "No test script found in mobile-app"
+          fi
+
+
+  pr-summary:
+    name: PR Summary Comment
+    runs-on: ubuntu-latest
+    needs: [api, web, mobile]
+    if: always()
+
+    steps:
+      - name: Post PR summary comment
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const pr = context.payload.pull_request;
+
+            const results = {
+              api: "${{ needs.api.result }}",
+              web: "${{ needs.web.result }}",
+              mobile: "${{ needs.mobile.result }}",
+            };
+
+            function emoji(state) {
+              if (state === "success") return "✅";
+              if (state === "failure") return "❌";
+              return "⚠️";
+            }
+
+            const body = `
+            **Automated PR checks completed**
+
+            - API: ${emoji(results.api)} \`${results.api}\`
+            - Web: ${emoji(results.web)} \`${results.web}\`
+            - Mobile: ${emoji(results.mobile)} \`${results.mobile}\`
+
+            > Note: Lint is enforced. If any job shows ❌, fix lint/test errors in that project.
+            `.trim();
+
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: pr.number,
+              body
+            });
